@@ -1,0 +1,34 @@
+{
+  "dependencies": {
+    "docker.io": {
+      "version": "0.9.8",
+      "dependencies": {
+        "docker-modem": {
+          "version": "0.1.10",
+          "dependencies": {
+            "querystring": {
+              "version": "0.2.0"
+            },
+            "follow-redirects": {
+              "version": "0.0.3",
+              "dependencies": {
+                "underscore": {
+                  "version": "1.6.0"
+                }
+              }
+            },
+            "debug": {
+              "version": "0.7.4"
+            }
+          }
+        },
+        "flat-validator": {
+          "version": "0.0.1"
+        },
+        "node-v8-clone": {
+          "version": "0.4.5"
+        }
+      }
+    }
+  }
+}

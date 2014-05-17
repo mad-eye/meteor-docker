@@ -40,10 +40,13 @@ var createContainer = Meteor._wrapAsync(function(options, callback){
 
 //e.g. createVolumeContainer("/app");
 function createVolumeContainer(volume){
+  var vols = {}
+  vols[volume] = {};
+
   var volumeContainer = createContainer({
     Image: "ubuntu",
     Cmd: ['true'],
-    "Volumes":{volume: {}}
+    "Volumes": vols
   });
   return volumeContainer;
 };

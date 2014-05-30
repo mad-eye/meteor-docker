@@ -3,11 +3,10 @@ docker = {};
 var Docker = Npm.require('dockerode');
 var exports = {};
 
-//TODO this should be configurable with Metoer settings
 var client = new Docker({
-  host: 'http://127.0.0.1',
   version: "v1.11",
-  port: 4243
+  host: "http://" + Meteor.settings.docker.host,
+  port: parseInt(Meteor.settings.docker.port)
 });
 
 var _ = Npm.require("underscore");

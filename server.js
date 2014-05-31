@@ -1,22 +1,16 @@
-docker = {};
-
-var Docker = Npm.require('dockerode');
-var exports = {};
-
-var client = new Docker({
-  version: "v1.11",
-  host: "http://" + Meteor.settings.docker.host,
-  port: parseInt(Meteor.settings.docker.port)
-});
-
+var Dockerode = Npm.require('dockerode');
 var _ = Npm.require("underscore");
 
-var listContainers =  Meteor._wrapAsync(function(callback){
-  client.listContainers(callback);
+Docker = function (options){
+  this.client = new Dockerode(options);
+};
+
+Docker.prototype.listContainers = Meteor._wrapAsync(function(callback){
+  this.client.listContainers(callback);
 });
 
-var createContainer = Meteor._wrapAsync(function(options, callback){
-  client.createContainer(options, function(err, container){
+Docker.prototype.createContainer = Meteor._wrapAsync(function(options, callback){
+  this.client.createContainer(options, function(err, container){
     if (err){
       return callback(err)
     } else {
@@ -32,27 +26,24 @@ var createContainer = Meteor._wrapAsync(function(options, callback){
         container._asyncStart(options, callback);
       });
 
+      container._asyncInspect = container.inspect;
+      container.inspect = Meteor._wrapAsync(function(callback){
+        container._asyncInspect(callback);
+      });
+
       callback(null, container);
     }
   });
 });
 
-//e.g. createVolumeContainer("/app");
-function createVolumeContainer(volume){
+Docker.prototype.createVolumeContainer = function(volume){
   var vols = {}
   vols[volume] = {};
 
-  var volumeContainer = createContainer({
+  var volumeContainer = this.createContainer({
     Image: "ubuntu",
     Cmd: ['true'],
     "Volumes": vols
   });
   return volumeContainer;
 };
-
-//exports
-docker.createContainer = createContainer;
-docker.createVolumeContainer = createVolumeContainer;
-docker.listContainers = listContainers;
-docker.client = client;
-

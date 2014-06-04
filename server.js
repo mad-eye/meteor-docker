@@ -41,7 +41,7 @@ Docker.prototype.createVolumeContainer = function(volume){
   vols[volume] = {};
 
   var volumeContainer = this.createContainer({
-    Image: "ubuntu",
+    Image: "busybox",
     Cmd: ['true'],
     "Volumes": vols
   });

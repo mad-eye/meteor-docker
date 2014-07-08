@@ -47,3 +47,7 @@ Docker.prototype.createVolumeContainer = function(volume){
   });
   return volumeContainer;
 };
+
+Docker.prototype.stopContainer = Meteor._wrapAsync(function(containerId, callback){
+  this.client.getContainer(containerId).stop(callback);
+});

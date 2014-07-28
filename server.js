@@ -2,6 +2,9 @@ var Dockerode = Npm.require('dockerode');
 var _ = Npm.require("underscore");
 
 Docker = function (options){
+  this.host = options.host;
+  this.port = options.port;
+  options.host = "http://" + options.host;
   this.client = new Dockerode(options);
 };
 

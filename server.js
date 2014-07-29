@@ -8,6 +8,10 @@ Docker = function (options){
   this.client = new Dockerode(options);
 };
 
+Docker.prototype.getContainer = function(id){
+  return asyncifyContainer(this.client.getContainer(id));
+}
+
 Docker.prototype.listContainers = Meteor._wrapAsync(function(callback){
   this.client.listContainers(callback);
 });
@@ -17,23 +21,7 @@ Docker.prototype.createContainer = Meteor._wrapAsync(function(options, callback)
     if (err){
       return callback(err)
     } else {
-      //TODO do something cooler here and wrap all functions
-
-      container._asyncAttach = container.attach;
-      container.attach = Meteor._wrapAsync(function(options, callback){
-        container._asyncAttach(options, callback);
-      });
-
-      container._asyncStart = container.start;
-      container.start = Meteor._wrapAsync(function(options, callback){
-        container._asyncStart(options, callback);
-      });
-
-      container._asyncInspect = container.inspect;
-      container.inspect = Meteor._wrapAsync(function(callback){
-        container._asyncInspect(callback);
-      });
-
+      asyncifyContainer(container);
       callback(null, container);
     }
   });
@@ -52,5 +40,38 @@ Docker.prototype.createVolumeContainer = function(volume){
 };
 
 Docker.prototype.stopContainer = Meteor._wrapAsync(function(containerId, callback){
-  this.client.getContainer(containerId).stop(callback);
+  this.client.getContainer(containerId).stop(function(error, result){
+    // console.log("ERROR", error);
+    // console.log("RESULT", result);
+    if (error && error.statusCode == 304){
+      callback(null, result)
+    } else {
+      callback(error, result);
+    }
+  });
 });
+
+function asyncifyContainer(container){
+  if (! container){
+    return null;
+  }
+
+  //is there a slick way to wrap all the functions on container?
+
+  container._asyncAttach = container.attach;
+  container.attach = Meteor._wrapAsync(function(options, callback){
+    container._asyncAttach(options, callback);
+  });
+
+  container._asyncStart = container.start;
+  container.start = Meteor._wrapAsync(function(options, callback){
+    container._asyncStart(options, callback);
+  });
+
+  container._asyncInspect = container.inspect;
+  container.inspect = Meteor._wrapAsync(function(callback){
+    container._asyncInspect(callback);
+  });
+
+  return container;
+}

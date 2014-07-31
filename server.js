@@ -43,8 +43,12 @@ Docker.prototype.stopContainer = Meteor._wrapAsync(function(containerId, callbac
   this.client.getContainer(containerId).stop(function(error, result){
     // console.log("ERROR", error);
     // console.log("RESULT", result);
+
     if (error && error.statusCode == 304){
-      callback(null, result)
+      callback(null, result);
+    } else if (error && error.statusCode == 404){
+      console.log("Tried to stop container", containerId, "but it was not found running");
+      callback(null, result);
     } else {
       callback(error, result);
     }

@@ -41,6 +41,9 @@ Docker.prototype.createVolumeContainer = function(volume){
 
 Docker.prototype.stopContainer = Meteor._wrapAsync(function(containerId, callback){
   this.client.getContainer(containerId).stop(function(error, result){
+    if (error){
+      console.log(error.statusCode, error, result);
+    }
     // console.log("ERROR", error);
     // console.log("RESULT", result);
 

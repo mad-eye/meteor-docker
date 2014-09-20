@@ -58,6 +58,23 @@ Docker.prototype.stopContainer = Meteor._wrapAsync(function(containerId, callbac
   });
 });
 
+Docker.prototype.removeContainer = Meteor._wrapAsync(function(containerId, callback){
+  this.client.getContainer(containerId).remove(function(error, result){
+    if (error){
+      console.log(error.statusCode, error, result);
+    }
+    if (error && error.statusCode == 304){
+      callback(null, result);
+    } else if (error && error.statusCode == 404){
+      console.log("Tried to remove container", containerId, "but it was not found");
+      callback(null, result);
+    } else {
+      callback(error, result);
+    }
+  });
+});
+
+
 function asyncifyContainer(container){
   if (! container){
     return null;
